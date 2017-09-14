@@ -16,6 +16,7 @@ public class RecordProcessorEdited {
 	private static int numberOfPeople;
 	private static File file;
 	private static Scanner scanner;
+	private static StringBuffer stringBuff = new StringBuffer();
 	private static int ageSum = 0;
 	private static float ageAverage = 0f;
 	private static int numberOfCommissionPaidEmployees = 0;
@@ -113,7 +114,7 @@ public class RecordProcessorEdited {
 		}
 	}
 	
-	public static void printFileFormat(StringBuffer stringBuff){
+	public static void printFileFormat(){
 		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
 
 		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
@@ -132,10 +133,55 @@ public class RecordProcessorEdited {
 		}
 
 	}
+
+	public static void createHashOfDuplicateNames(){
+		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
+		int countPeopleWithSameFirstName = 0;
+		for (int i = 0; i < firstnames.length; i++) {
+			if (hashCountingUniqueFirstNames.containsKey(firstnames[i])) {
+				hashCountingUniqueFirstNames.put(firstnames[i], hashCountingUniqueFirstNames.get(firstnames[i]) + 1);
+				countPeopleWithSameFirstName++;
+			} else {
+			hashCountingUniqueFirstNames.put(firstnames[i], 1);
+			}
+		}
+		checkForDuplicateNameOccurance(hashCountingUniqueFirstNames, countPeopleWithSameFirstName);		
+
+		HashMap<String, Integer> hashCountingUniqueLastNames = new HashMap<String, Integer>();
+		int countPeopleWithSameLastName = 0;
+		for (int i = 0; i < lastnames.length; i++) {
+			if (hashCountingUniqueLastNames.containsKey(lastnames[i])) {
+				hashCountingUniqueLastNames.put(lastnames[i], hashCountingUniqueLastNames.get(lastnames[i]) + 1);
+				countPeopleWithSameLastName++;
+			} else {
+				hashCountingUniqueLastNames.put(lastnames[i], 1);
+			}
+		}
+		checkForDuplicateNameOccurance(hashCountingUniqueLastNames, countPeopleWithSameLastName);		
+	}
+	
+	public static void checkForDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames, int countPeopleWithSameName ){
+		if (countPeopleWithSameName > 0){
+			printDuplicateNameOccurance(hashCountingUniqueNames, "Last");
+		} else {
+			stringBuff.append(String.format("All last names are unique"));
+		}
+
+	}
+	
+	public static void printDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames, String typeOfName){
+		stringBuff.append(String.format("\n" + typeOfName + " names with more than one person sharing it:\n"));
+			Set<String> set = hashCountingUniqueNames.keySet();
+			for (String str : set) {
+				if (hashCountingUniqueNames.get(str) > 1) {
+					stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueNames.get(str)));
+				}
+			}		
+	}
 	
 	public static String processFile(String fileName) {
 		initializeFile(fileName);
-		StringBuffer stringBuff = new StringBuffer();
+//		StringBuffer stringBuff = new StringBuffer();
 		scanner = initializeScanner(file);
 
 		numberOfPeople = countNonemptyLinesInFile(scanner);
@@ -191,7 +237,7 @@ public class RecordProcessorEdited {
 				*/
 			}	
 		}
-
+	
 		// print the rows
 //		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
 //
@@ -210,7 +256,7 @@ public class RecordProcessorEdited {
 //			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
 //		}
 
-		printFileFormat(stringBuff);
+		printFileFormat();
 		
 		for (int i = 0; i < firstnames.length; i++) {
 			ageSum += ages[i];
@@ -234,52 +280,52 @@ public class RecordProcessorEdited {
 		salaryAverage = salarySum / numberOfSalaryPaidEmployees;
 		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 
-		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
-		int countPeopleWithSameFirstName = 0;
-		for (int i = 0; i < firstnames.length; i++) {
-			if (hashCountingUniqueFirstNames.containsKey(firstnames[i])) {
-				hashCountingUniqueFirstNames.put(firstnames[i], hashCountingUniqueFirstNames.get(firstnames[i]) + 1);
-				countPeopleWithSameFirstName++;
-			} else {
-				hashCountingUniqueFirstNames.put(firstnames[i], 1);
-			}
-		}
-
-		stringBuff.append(String.format("\nFirst names with more than one person sharing it:\n"));
-		if (countPeopleWithSameFirstName > 0) {
-			Set<String> set = hashCountingUniqueFirstNames.keySet();
-			for (String str : set) {
-				if (hashCountingUniqueFirstNames.get(str) > 1) {
-					stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueFirstNames.get(str)));
-				}
-			}
-		} else {
-			stringBuff.append(String.format("All first names are unique"));
-		}
-
-		HashMap<String, Integer> hashCountingUniqueLastNames = new HashMap<String, Integer>();
-		int countPeopleWithSameLastName = 0;
-		for (int i = 0; i < lastnames.length; i++) {
-			if (hashCountingUniqueLastNames.containsKey(lastnames[i])) {
-				hashCountingUniqueLastNames.put(lastnames[i], hashCountingUniqueLastNames.get(lastnames[i]) + 1);
-				countPeopleWithSameLastName++;
-			} else {
-				hashCountingUniqueLastNames.put(lastnames[i], 1);
-			}
-		}
-
-		stringBuff.append(String.format("\nLast names with more than one person sharing it:\n"));
-		if (countPeopleWithSameLastName > 0) {
-			Set<String> set = hashCountingUniqueLastNames.keySet();
-			for (String str : set) {
-				if (hashCountingUniqueLastNames.get(str) > 1) {
-					stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueLastNames.get(str)));
-				}
-			}
-		} else {
-			stringBuff.append(String.format("All last names are unique"));
-		}
-
+//		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
+//		int countPeopleWithSameFirstName = 0;
+//		for (int i = 0; i < firstnames.length; i++) {
+//			if (hashCountingUniqueFirstNames.containsKey(firstnames[i])) {
+//				hashCountingUniqueFirstNames.put(firstnames[i], hashCountingUniqueFirstNames.get(firstnames[i]) + 1);
+//				countPeopleWithSameFirstName++;
+//			} else {
+//				hashCountingUniqueFirstNames.put(firstnames[i], 1);
+//			}
+//		}
+//
+//		stringBuff.append(String.format("\nFirst names with more than one person sharing it:\n"));
+//		if (countPeopleWithSameFirstName > 0) {
+//			Set<String> set = hashCountingUniqueFirstNames.keySet();
+//			for (String str : set) {
+//				if (hashCountingUniqueFirstNames.get(str) > 1) {
+//					stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueFirstNames.get(str)));
+//				}
+//			}
+//		} else {
+//			stringBuff.append(String.format("All first names are unique"));
+//		}
+//		createHashOfDuplicateNames(stringBuff);
+//		HashMap<String, Integer> hashCountingUniqueLastNames = new HashMap<String, Integer>();
+//		int countPeopleWithSameLastName = 0;
+//		for (int i = 0; i < lastnames.length; i++) {
+//			if (hashCountingUniqueLastNames.containsKey(lastnames[i])) {
+//				hashCountingUniqueLastNames.put(lastnames[i], hashCountingUniqueLastNames.get(lastnames[i]) + 1);
+//				countPeopleWithSameLastName++;
+//			} else {
+//				hashCountingUniqueLastNames.put(lastnames[i], 1);
+//			}
+//		}
+//
+//		stringBuff.append(String.format("\nLast names with more than one person sharing it:\n"));
+//		if (countPeopleWithSameLastName > 0) {
+//			Set<String> set = hashCountingUniqueLastNames.keySet();
+//			for (String str : set) {
+//				if (hashCountingUniqueLastNames.get(str) > 1) {
+//					stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueLastNames.get(str)));
+//				}
+//			}
+//		} else {
+//			stringBuff.append(String.format("All last names are unique"));
+//		}
+		createHashOfDuplicateNames();
 		scanner.close();
 		return stringBuff.toString();
 	}
