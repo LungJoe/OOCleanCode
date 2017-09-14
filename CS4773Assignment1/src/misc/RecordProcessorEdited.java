@@ -113,6 +113,26 @@ public class RecordProcessorEdited {
 		}
 	}
 	
+	public static void printFileFormat(StringBuffer stringBuff){
+		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
+
+		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
+		for (int i = 0; i < 30; i++)
+			stringBuff.append(String.format("-"));
+		stringBuff.append(String.format(" ---  "));
+		for (int i = 0; i < 12; i++)
+			stringBuff.append(String.format("-"));
+		stringBuff.append(String.format(" "));
+		for (int i = 0; i < 12; i++)
+			stringBuff.append(String.format("-"));
+		stringBuff.append(String.format("\n"));
+
+		for (int i = 0; i < firstnames.length; i++) {
+			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
+		}
+
+	}
+	
 	public static String processFile(String fileName) {
 		initializeFile(fileName);
 		StringBuffer stringBuff = new StringBuffer();
@@ -173,23 +193,25 @@ public class RecordProcessorEdited {
 		}
 
 		// print the rows
-		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
+//		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
+//
+//		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
+//		for (int i = 0; i < 30; i++)
+//			stringBuff.append(String.format("-"));
+//		stringBuff.append(String.format(" ---  "));
+//		for (int i = 0; i < 12; i++)
+//			stringBuff.append(String.format("-"));
+//		stringBuff.append(String.format(" "));
+//		for (int i = 0; i < 12; i++)
+//			stringBuff.append(String.format("-"));
+//		stringBuff.append(String.format("\n"));
+//
+//		for (int i = 0; i < firstnames.length; i++) {
+//			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
+//		}
 
-		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
-		for (int i = 0; i < 30; i++)
-			stringBuff.append(String.format("-"));
-		stringBuff.append(String.format(" ---  "));
-		for (int i = 0; i < 12; i++)
-			stringBuff.append(String.format("-"));
-		stringBuff.append(String.format(" "));
-		for (int i = 0; i < 12; i++)
-			stringBuff.append(String.format("-"));
-		stringBuff.append(String.format("\n"));
-
-		for (int i = 0; i < firstnames.length; i++) {
-			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
-		}
-
+		printFileFormat(stringBuff);
+		
 		for (int i = 0; i < firstnames.length; i++) {
 			ageSum += ages[i];
 			if (employeeTypes[i].equals("Commission")) {
