@@ -34,7 +34,7 @@ public class TestRecordProcessor {
 		assertEquals(null, RecordProcessorEdited.processFile("data2.txt"));
 	}
 
-	@Test
+	@Test (expected = NumberFormatException.class)
 	public void testFileData3() {
 		assertEquals(null, RecordProcessorEdited.processFile("data3.txt"));
 	}
