@@ -28,6 +28,8 @@ public class RecordProcessorEdited {
 	private static int numberOfSalaryPaidEmployees = 0;
 	private static double salarySum = 0;
 	private static double salaryAverage = 0;
+	private static int countPeopleWithSameFirstName = 0;
+	private static int countPeopleWithSameLastName = 0;
 
 	public static void initialzeEmployeeAttributeArrays(int numberOfPeople) {
 		firstnames = new String[numberOfPeople];
@@ -136,7 +138,6 @@ public class RecordProcessorEdited {
 
 	public static void createHashOfDuplicateNames(){
 		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
-		int countPeopleWithSameFirstName = 0;
 		for (int i = 0; i < firstnames.length; i++) {
 			if (hashCountingUniqueFirstNames.containsKey(firstnames[i])) {
 				hashCountingUniqueFirstNames.put(firstnames[i], hashCountingUniqueFirstNames.get(firstnames[i]) + 1);
@@ -145,10 +146,9 @@ public class RecordProcessorEdited {
 			hashCountingUniqueFirstNames.put(firstnames[i], 1);
 			}
 		}
-		checkForDuplicateNameOccurance(hashCountingUniqueFirstNames, countPeopleWithSameFirstName);		
-
+		checkForDuplicateNameOccurance(hashCountingUniqueFirstNames);	
 		HashMap<String, Integer> hashCountingUniqueLastNames = new HashMap<String, Integer>();
-		int countPeopleWithSameLastName = 0;
+		countPeopleWithSameFirstName = 0;
 		for (int i = 0; i < lastnames.length; i++) {
 			if (hashCountingUniqueLastNames.containsKey(lastnames[i])) {
 				hashCountingUniqueLastNames.put(lastnames[i], hashCountingUniqueLastNames.get(lastnames[i]) + 1);
@@ -157,16 +157,17 @@ public class RecordProcessorEdited {
 				hashCountingUniqueLastNames.put(lastnames[i], 1);
 			}
 		}
-		checkForDuplicateNameOccurance(hashCountingUniqueLastNames, countPeopleWithSameLastName);		
+		checkForDuplicateNameOccurance(hashCountingUniqueLastNames);		
 	}
 	
-	public static void checkForDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames, int countPeopleWithSameName ){
-		if (countPeopleWithSameName > 0){
+	public static void checkForDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames){
+		if (countPeopleWithSameFirstName > 0 ){
+			printDuplicateNameOccurance(hashCountingUniqueNames, "First");
+		} else if (countPeopleWithSameLastName > 0){
 			printDuplicateNameOccurance(hashCountingUniqueNames, "Last");
 		} else {
 			stringBuff.append(String.format("All last names are unique"));
 		}
-
 	}
 	
 	public static void printDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames, String typeOfName){
