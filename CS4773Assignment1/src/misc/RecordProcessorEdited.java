@@ -84,7 +84,7 @@ public class RecordProcessorEdited {
 			if (lastnames[index] == null)
 				break;
 			if (lastnames[index].compareTo(wordsInCurrentLine[1]) > 0) {
-				pushAttributesBackwards(index);
+				pushPersonBackwardsInLists(index);
 				break;
 			}
 
@@ -103,7 +103,7 @@ public class RecordProcessorEdited {
 		numberOfPeople++;
 	}
 	
-	public static void pushAttributesBackwards(int index) {
+	public static void pushPersonBackwardsInLists(int index) {
 		for (int i = numberOfPeople; i > index; i--) {
 			firstnames[i] = firstnames[i - 1];
 			lastnames[i] = lastnames[i - 1];
@@ -213,18 +213,18 @@ public class RecordProcessorEdited {
 		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 
 		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
-		int c1 = 0;
+		int countPeopleWithSameFirstName = 0;
 		for (int i = 0; i < firstnames.length; i++) {
 			if (hashCountingUniqueFirstNames.containsKey(firstnames[i])) {
 				hashCountingUniqueFirstNames.put(firstnames[i], hashCountingUniqueFirstNames.get(firstnames[i]) + 1);
-				c1++;
+				countPeopleWithSameFirstName++;
 			} else {
 				hashCountingUniqueFirstNames.put(firstnames[i], 1);
 			}
 		}
 
 		stringBuff.append(String.format("\nFirst names with more than one person sharing it:\n"));
-		if (c1 > 0) {
+		if (countPeopleWithSameFirstName > 0) {
 			Set<String> set = hashCountingUniqueFirstNames.keySet();
 			for (String str : set) {
 				if (hashCountingUniqueFirstNames.get(str) > 1) {
@@ -236,18 +236,18 @@ public class RecordProcessorEdited {
 		}
 
 		HashMap<String, Integer> hashCountingUniqueLastNames = new HashMap<String, Integer>();
-		int c21 = 0;
+		int countPeopleWithSameLastName = 0;
 		for (int i = 0; i < lastnames.length; i++) {
 			if (hashCountingUniqueLastNames.containsKey(lastnames[i])) {
 				hashCountingUniqueLastNames.put(lastnames[i], hashCountingUniqueLastNames.get(lastnames[i]) + 1);
-				c21++;
+				countPeopleWithSameLastName++;
 			} else {
 				hashCountingUniqueLastNames.put(lastnames[i], 1);
 			}
 		}
 
 		stringBuff.append(String.format("\nLast names with more than one person sharing it:\n"));
-		if (c21 > 0) {
+		if (countPeopleWithSameLastName > 0) {
 			Set<String> set = hashCountingUniqueLastNames.keySet();
 			for (String str : set) {
 				if (hashCountingUniqueLastNames.get(str) > 1) {
@@ -258,9 +258,7 @@ public class RecordProcessorEdited {
 			stringBuff.append(String.format("All last names are unique"));
 		}
 
-		// close the file
 		scanner.close();
-
 		return stringBuff.toString();
 	}
 
