@@ -8,7 +8,6 @@ import java.util.Scanner;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import misc.RecordProcessor;
 import misc.RecordProcessorEdited;
 
 public class TestRecordProcessor {
@@ -37,5 +36,10 @@ public class TestRecordProcessor {
 	@Test (expected = NumberFormatException.class)
 	public void testFileData3() {
 		assertEquals(null, RecordProcessorEdited.processFile("data3.txt"));
+	}
+	
+	@Test
+	public void testFileData4(){
+		assertEquals(expectedFromData1, RecordProcessorEdited.processFile("data4.txt"));
 	}
 }
