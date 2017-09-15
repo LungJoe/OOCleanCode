@@ -40,6 +40,6 @@ public class TestRecordProcessor {
 	
 	@Test
 	public void testFileData4(){
-		assertEquals(expectedFromData1, RecordProcessorEdited.processFile("data4.txt"));
+		assertEquals(expectedFromData1, RecordProcessorEdited.processFile("data4"));
 	}
 }
