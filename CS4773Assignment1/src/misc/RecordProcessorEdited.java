@@ -31,6 +31,11 @@ public class RecordProcessorEdited {
 	private static int countPeopleWithSameFirstName = 0;
 	private static int countPeopleWithSameLastName = 0;
 
+	//Test commit
+	/**
+	 * Jonathan Fisher was here!
+	 */
+	
 	public static void initialzeEmployeeAttributeArrays(int numberOfPeople) {
 		firstnames = new String[numberOfPeople];
 		lastnames = new String[numberOfPeople];
