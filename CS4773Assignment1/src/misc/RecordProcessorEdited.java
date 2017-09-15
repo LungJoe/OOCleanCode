@@ -135,7 +135,30 @@ public class RecordProcessorEdited {
 		}
 
 	}
-
+	/*public static void createHashMapsOfNames(String nameType, String[] nameList){
+		HashMap<String, Integer> hashCountingUniqueNames = new HashMap<String, Integer>();
+		int countOfSameName = 0;
+		for(int i = 0; i < nameList.length; i++){
+			if(hashCountingUniqueNames.containsKey(nameList[i])){
+				hashCountingUniqueNames.put(nameList[i], hashCountingUniqueNames.get(nameList[i])+1);
+				countOfSameName ++;
+			}
+			else{
+				hashCountingUniqueNames.put(nameList[i], 1);
+			}
+		}
+		checkOccuranceOfDuplicateNames(nameType, hashCountingUniqueNames, countOfSameName);
+	}
+	
+	private static void checkOccuranceOfDuplicateNames(String nameType, HashMap<String, Integer> hashCountingUniqueNames, int countOfSameName){
+		if(countOfSameName > 0){
+			printDuplicateNameOccurance(hashCountingUniqueNames, nameType);
+		}
+		else{
+			stringBuff.append(String.format("All %s names are unique", nameType.toLowerCase()));
+		}
+	}
+	*/
 	public static void createHashOfDuplicateNames(){
 		HashMap<String, Integer> hashCountingUniqueFirstNames = new HashMap<String, Integer>();
 		for (int i = 0; i < firstnames.length; i++) {
