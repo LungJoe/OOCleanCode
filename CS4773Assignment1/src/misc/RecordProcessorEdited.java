@@ -73,29 +73,38 @@ public class RecordProcessorEdited {
 	}
 
 	public static void sortAllAttributeListsByLastName(String[] wordsInCurrentLine) {
-		int index = 0;
+		int currentLineIndex = 0;
 
-		for (; index < lastnames.length; index++) {
-			if (lastnames[index] == null)
+		for (; currentLineIndex < lastnames.length; currentLineIndex++) {
+			if (lastnames[currentLineIndex] == null)
 				break;
-			if (lastnames[index].compareTo(wordsInCurrentLine[1]) > 0) {
-				pushPersonBackwardsInLists(index);
+			if (lastnames[currentLineIndex].compareTo(wordsInCurrentLine[1]) > 0) {
+				pushPersonBackwardsInLists(currentLineIndex);
 				break;
 			}
-
 		}
-
-		firstnames[index] = wordsInCurrentLine[0];
-		lastnames[index] = wordsInCurrentLine[1];
-		employeeTypes[index] = wordsInCurrentLine[3];
-
+		
+		setEmployeeValues(currentLineIndex, wordsInCurrentLine);
+		numberOfPeople++;
+	}
+	
+	public static void setEmployeeValues(int currentLineIndex,String[] wordsInCurrentLine){
+		firstnames[currentLineIndex] = wordsInCurrentLine[0];
+		lastnames[currentLineIndex] = wordsInCurrentLine[1];
+		employeeTypes[currentLineIndex] = wordsInCurrentLine[3];
+		
+		checkForInvalidValue(currentLineIndex, wordsInCurrentLine);
+	}
+	
+	public static void checkForInvalidValue(int currentLineIndex, String[] wordsInCurrentLine){
 		try {
-			ages[index] = Integer.parseInt(wordsInCurrentLine[2]);
-			pay[index] = Double.parseDouble(wordsInCurrentLine[4]);
+			ages[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
+			pay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
 		} catch (Exception e) {
 			throw new NumberFormatException();
+//			System.err.println(e.getMessage());
+//			scanner.close();
 		}
-		numberOfPeople++;
 	}
 	
 	public static void pushPersonBackwardsInLists(int index) {
@@ -127,6 +136,7 @@ public class RecordProcessorEdited {
 		}
 
 	}
+	
 	private static void calculatePaySums(){
 		for (int i = 0; i < firstnames.length; i++) {
 			ageSum += ages[i];
@@ -142,7 +152,6 @@ public class RecordProcessorEdited {
 			}
 		}
 	}
-	//private static 
 	private static void putAveragesInOutputString(){
 		float ageAverage = (float) ageSum / firstnames.length;
 		stringBuff.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
@@ -153,6 +162,7 @@ public class RecordProcessorEdited {
 		double salaryAverage = salarySum / numberOfSalaryPaidEmployees;
 		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 	}
+	
 	public static void createHashMapsOfNames(String nameType, String[] nameList){
 		HashMap<String, Integer> hashCountingUniqueNames = new HashMap<String, Integer>();
 		countOfSameName = 0;
@@ -212,20 +222,20 @@ public class RecordProcessorEdited {
 		}
 	
 		printFileFormat();
-		
-		for (int i = 0; i < firstnames.length; i++) {
-			ageSum += ages[i];
-			if (employeeTypes[i].equals("Commission")) {
-				commissionSum += pay[i];
-				numberOfCommissionPaidEmployees++;
-			} else if (employeeTypes[i].equals("Hourly")) {
-				hourlySum += pay[i];
-				numberOfHourlyPaidEmployees++;
-			} else if (employeeTypes[i].equals("Salary")) {
-				salarySum += pay[i];
-				numberOfSalaryPaidEmployees++;
-			}
-		}
+		calculatePaySums();
+//		for (int i = 0; i < firstnames.length; i++) {
+//			ageSum += ages[i];
+//			if (employeeTypes[i].equals("Commission")) {
+//				commissionSum += pay[i];
+//				numberOfCommissionPaidEmployees++;
+//			} else if (employeeTypes[i].equals("Hourly")) {
+//				hourlySum += pay[i];
+//				numberOfHourlyPaidEmployees++;
+//			} else if (employeeTypes[i].equals("Salary")) {
+//				salarySum += pay[i];
+//				numberOfSalaryPaidEmployees++;
+//			}
+//		}
 		putAveragesInOutputString();
 		
 
