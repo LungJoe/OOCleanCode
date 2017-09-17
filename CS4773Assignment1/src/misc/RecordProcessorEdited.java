@@ -14,21 +14,22 @@ public class RecordProcessorEdited {
 	private static int[] ages;
 	private static double[] pay;
 	private static int numberOfPeople;
-	
+
 	private static File file;
 	private static Scanner scanner;
 	private static StringBuffer stringBuff = new StringBuffer();
-	
+
 	private static int ageSum = 0;
 	private static double commissionSum = 0;
 	private static double hourlySum = 0;
 	private static double salarySum = 0;
-	
+
 	private static int numberOfCommissionPaidEmployees = 0;
 	private static int numberOfHourlyPaidEmployees = 0;
 	private static int numberOfSalaryPaidEmployees = 0;
-	
+
 	private static int countOfSameName;
+	private static int sortIndex;
 
 	public static String processFile(String fileName) {
 		file = new File(fileName);
@@ -40,24 +41,19 @@ public class RecordProcessorEdited {
 		scanner.close();
 		scanner = initializeScanner(file);
 
-		if (checkIfFileIsEmpty(numberOfPeople))
+		if (checkIfFileIsEmpty(numberOfPeople) == true)
 			return closeAndExit();
 
 		numberOfPeople = 0;
 
-		while (scanner.hasNextLine()) {
-			String currentLine = scanner.nextLine();
-			if (currentLine.length() > 0)
-				sortAllAttributeListsByLastName(currentLine);
-		}
-
+		putEmployeesIntoAttributeArraysByReadingFile();
 		printFileFormat();
 		calculatePaySums();
 		putAveragesInOutputString();
 		createHashMapsOfNames("First", firstnames);
 		createHashMapsOfNames("Last", lastnames);
 		scanner.close();
-		
+
 		return stringBuff.toString();
 	}
 
@@ -106,20 +102,28 @@ public class RecordProcessorEdited {
 		return null;
 	}
 
+	public static void putEmployeesIntoAttributeArraysByReadingFile() {
+		while (scanner.hasNextLine()) {
+			String currentLine = scanner.nextLine();
+			if (currentLine.length() > 0) {
+				sortAllAttributeListsByLastName(currentLine);
+				setEmployeeValues(sortIndex, currentLine);
+			}
+		}
+	}
+
 	private static void sortAllAttributeListsByLastName(String currentLine) {
 		String[] wordsInCurrentLine = currentLine.split(",");
-		int currentLineIndex = 0;
+		sortIndex = 0;
 
-		for (; currentLineIndex < lastnames.length; currentLineIndex++) {
-			if (lastnames[currentLineIndex] == null)
+		for (; sortIndex < lastnames.length; sortIndex++) {
+			if (lastnames[sortIndex] == null)
 				break;
-			if (lastnames[currentLineIndex].compareTo(wordsInCurrentLine[1]) > 0) {
-				pushPersonBackwardsInLists(currentLineIndex);
+			if (lastnames[sortIndex].compareTo(wordsInCurrentLine[1]) > 0) {
+				pushPersonBackwardsInLists(sortIndex);
 				break;
 			}
 		}
-
-		setEmployeeValues(currentLineIndex, wordsInCurrentLine);
 		numberOfPeople++;
 	}
 
@@ -133,12 +137,13 @@ public class RecordProcessorEdited {
 		}
 	}
 
-	private static void setEmployeeValues(int currentLineIndex, String[] wordsInCurrentLine) {
-		firstnames[currentLineIndex] = wordsInCurrentLine[0];
-		lastnames[currentLineIndex] = wordsInCurrentLine[1];
-		employeeTypes[currentLineIndex] = wordsInCurrentLine[3];
+	private static void setEmployeeValues(int sortIndex, String currentLine) {
+		String[] wordsInCurrentLine = currentLine.split(",");
+		firstnames[sortIndex] = wordsInCurrentLine[0];
+		lastnames[sortIndex] = wordsInCurrentLine[1];
+		employeeTypes[sortIndex] = wordsInCurrentLine[3];
 
-		checkForInvalidValue(currentLineIndex, wordsInCurrentLine);
+		checkForInvalidValue(sortIndex, wordsInCurrentLine);
 	}
 
 	private static void checkForInvalidValue(int currentLineIndex, String[] wordsInCurrentLine) {
@@ -156,17 +161,17 @@ public class RecordProcessorEdited {
 		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
 		for (int i = 0; i < 30; i++)
 			stringBuff.append(String.format("-"));
-		
+
 		stringBuff.append(String.format(" ---  "));
 		for (int i = 0; i < 12; i++)
 			stringBuff.append(String.format("-"));
-		
+
 		stringBuff.append(String.format(" "));
 		for (int i = 0; i < 12; i++)
 			stringBuff.append(String.format("-"));
-		
+
 		stringBuff.append(String.format("\n"));
-		for (int i = 0; i < firstnames.length; i++) 
+		for (int i = 0; i < firstnames.length; i++)
 			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
 	}
 
@@ -176,12 +181,10 @@ public class RecordProcessorEdited {
 			if (employeeTypes[i].equals("Commission")) {
 				commissionSum += pay[i];
 				numberOfCommissionPaidEmployees++;
-			} 
-			else if (employeeTypes[i].equals("Hourly")) {
+			} else if (employeeTypes[i].equals("Hourly")) {
 				hourlySum += pay[i];
 				numberOfHourlyPaidEmployees++;
-			} 
-			else if (employeeTypes[i].equals("Salary")) {
+			} else if (employeeTypes[i].equals("Salary")) {
 				salarySum += pay[i];
 				numberOfSalaryPaidEmployees++;
 			}
@@ -191,13 +194,13 @@ public class RecordProcessorEdited {
 	private static void putAveragesInOutputString() {
 		float ageAverage = (float) ageSum / firstnames.length;
 		stringBuff.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
-		
+
 		double commissionAverage = commissionSum / numberOfCommissionPaidEmployees;
 		stringBuff.append(String.format("Average commission:  $%12.2f\n", commissionAverage));
-		
+
 		double hourlyAverage = hourlySum / numberOfHourlyPaidEmployees;
 		stringBuff.append(String.format("Average hourly wage: $%12.2f\n", hourlyAverage));
-		
+
 		double salaryAverage = salarySum / numberOfSalaryPaidEmployees;
 		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 	}
@@ -205,13 +208,12 @@ public class RecordProcessorEdited {
 	private static void createHashMapsOfNames(String nameType, String[] nameList) {
 		HashMap<String, Integer> hashCountingUniqueNames = new HashMap<String, Integer>();
 		countOfSameName = 0;
-		
+
 		for (int i = 0; i < nameList.length; i++) {
 			if (hashCountingUniqueNames.containsKey(nameList[i])) {
 				hashCountingUniqueNames.put(nameList[i], hashCountingUniqueNames.get(nameList[i]) + 1);
 				countOfSameName++;
-			} 
-			else 
+			} else
 				hashCountingUniqueNames.put(nameList[i], 1);
 		}
 		checkOccuranceOfDuplicateNames(nameType, hashCountingUniqueNames);
@@ -220,8 +222,7 @@ public class RecordProcessorEdited {
 	private static void checkOccuranceOfDuplicateNames(String nameType, HashMap<String, Integer> hashCountingUniqueNames) {
 		if (countOfSameName > 0) {
 			printDuplicateNameOccurance(hashCountingUniqueNames, nameType);
-		} 
-		else
+		} else
 			stringBuff.append(String.format("All %s names are unique", nameType.toLowerCase()));
 	}
 
