@@ -15,11 +15,11 @@ import java.util.Set;
  */
 public class RecordProcessorEdited {
 
-	private static String[] firstnames;
-	private static String[] lastnames;
+	private static String[] employeeFirstnames;
+	private static String[] employeeLastnames;
 	private static String[] employeeTypes;
-	private static int[] ages;
-	private static double[] pay;
+	private static int[] employeeAges;
+	private static double[] employeePay;
 	private static int numberOfEmployees;
 
 	private static File file;
@@ -46,20 +46,14 @@ public class RecordProcessorEdited {
 	 * 			
 	 */
 	
-	public static String processFile(String fileName) {
-		
-		try{
+	public static String printEmployeeRecords(String fileName) {
 		readFileContents(fileName);
-		}catch (RuntimeException err){
-			return null;
-		}
-
 		putEmployeesIntoAttributeArraysByReadingFile();
 		printFileFormat();
 		calculatePaySums();
 		putAveragesInOutputString();
-		createHashMapsOfNames("First", firstnames);
-		createHashMapsOfNames("Last", lastnames);
+		createHashMapsOfNames("First", employeeFirstnames);
+		createHashMapsOfNames("Last", employeeLastnames);
 		fileReader.close();
 
 		return outputString.toString();
@@ -104,11 +98,11 @@ public class RecordProcessorEdited {
 	}
 
 	private static void initialzeEmployeeAttributeArrays(int numberOfPeople) {
-		firstnames = new String[numberOfPeople];
-		lastnames = new String[numberOfPeople];
-		ages = new int[numberOfPeople];
+		employeeFirstnames = new String[numberOfPeople];
+		employeeLastnames = new String[numberOfPeople];
+		employeeAges = new int[numberOfPeople];
 		employeeTypes = new String[numberOfPeople];
-		pay = new double[numberOfPeople];
+		employeePay = new double[numberOfPeople];
 	}
 
 	private static boolean checkIfFileIsEmpty(int nonEmptyLinesInFile) {
@@ -142,10 +136,10 @@ public class RecordProcessorEdited {
 		String[] wordsInCurrentLine = currentLine.split(",");
 		sortIndex = 0;
 
-		for (; sortIndex < lastnames.length; sortIndex++) {
-			if (lastnames[sortIndex] == null)
+		for (; sortIndex < employeeLastnames.length; sortIndex++) {
+			if (employeeLastnames[sortIndex] == null)
 				break;
-			if (lastnames[sortIndex].compareTo(wordsInCurrentLine[1]) > 0) {
+			if (employeeLastnames[sortIndex].compareTo(wordsInCurrentLine[1]) > 0) {
 				pushEmployeeBackwardsInLists(sortIndex);
 				break;
 			}
@@ -155,29 +149,29 @@ public class RecordProcessorEdited {
 
 	private static void pushEmployeeBackwardsInLists(int index) {
 		for (int i = numberOfEmployees; i > index; i--) {
-			firstnames[i] = firstnames[i - 1];
-			lastnames[i] = lastnames[i - 1];
-			ages[i] = ages[i - 1];
+			employeeFirstnames[i] = employeeFirstnames[i - 1];
+			employeeLastnames[i] = employeeLastnames[i - 1];
+			employeeAges[i] = employeeAges[i - 1];
 			employeeTypes[i] = employeeTypes[i - 1];
-			pay[i] = pay[i - 1];
+			employeePay[i] = employeePay[i - 1];
 		}
 	}
 	
 	private static void putEmployeeValuesIntoAttributeArrays(int currentLineIndex, String currentLine) {
 		try {
 			String[] wordsInCurrentLine = currentLine.split(",");
-			firstnames[sortIndex] = wordsInCurrentLine[0];
-			lastnames[sortIndex] = wordsInCurrentLine[1];
+			employeeFirstnames[sortIndex] = wordsInCurrentLine[0];
+			employeeLastnames[sortIndex] = wordsInCurrentLine[1];
 			employeeTypes[sortIndex] = wordsInCurrentLine[3];
-			ages[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
-			pay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
+			employeeAges[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
+			employeePay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
 		} catch (Exception e) {
 			throw new NumberFormatException();
 		}
 	}
 
 	private static void printFileFormat() {
-		outputString.append(String.format("# of people imported: %d\n", firstnames.length));
+		outputString.append(String.format("# of people imported: %d\n", employeeFirstnames.length));
 
 		outputString.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
 		for (int i = 0; i < 30; i++)
@@ -192,28 +186,28 @@ public class RecordProcessorEdited {
 			outputString.append(String.format("-"));
 
 		outputString.append(String.format("\n"));
-		for (int i = 0; i < firstnames.length; i++)
-			outputString.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
+		for (int i = 0; i < employeeFirstnames.length; i++)
+			outputString.append(String.format("%-30s %-3d  %-12s $%12.2f\n", employeeFirstnames[i] + " " + employeeLastnames[i], employeeAges[i], employeeTypes[i], employeePay[i]));
 	}
 
 	private static void calculatePaySums() {
-		for (int i = 0; i < firstnames.length; i++) {
-			ageSum += ages[i];
+		for (int i = 0; i < employeeFirstnames.length; i++) {
+			ageSum += employeeAges[i];
 			if (employeeTypes[i].equals("Commission")) {
-				commissionSum += pay[i];
+				commissionSum += employeePay[i];
 				numberOfCommissionPaidEmployees++;
 			} else if (employeeTypes[i].equals("Hourly")) {
-				hourlySum += pay[i];
+				hourlySum += employeePay[i];
 				numberOfHourlyPaidEmployees++;
 			} else if (employeeTypes[i].equals("Salary")) {
-				salarySum += pay[i];
+				salarySum += employeePay[i];
 				numberOfSalaryPaidEmployees++;
 			}
 		}
 	}
 
 	private static void putAveragesInOutputString() {
-		float ageAverage = (float) ageSum / firstnames.length;
+		float ageAverage = (float) ageSum / employeeFirstnames.length;
 		outputString.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
 
 		double commissionAverage = commissionSum / numberOfCommissionPaidEmployees;
