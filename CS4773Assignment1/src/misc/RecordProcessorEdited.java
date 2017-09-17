@@ -72,7 +72,8 @@ public class RecordProcessorEdited {
 		return null;
 	}
 
-	public static void sortAllAttributeListsByLastName(String[] wordsInCurrentLine) {
+	public static void sortAllAttributeListsByLastName(String currentLine) {
+		String[] wordsInCurrentLine = currentLine.split(",");
 		int currentLineIndex = 0;
 
 		for (; currentLineIndex < lastnames.length; currentLineIndex++) {
@@ -216,29 +217,13 @@ public class RecordProcessorEdited {
 		while (scanner.hasNextLine()) {
 			String currentLine = scanner.nextLine();
 			if (currentLine.length() > 0) {
-				String[] wordsInCurrentLine = currentLine.split(",");
-				sortAllAttributeListsByLastName(wordsInCurrentLine);
+				sortAllAttributeListsByLastName(currentLine);
 			}	
 		}
 	
 		printFileFormat();
 		calculatePaySums();
-//		for (int i = 0; i < firstnames.length; i++) {
-//			ageSum += ages[i];
-//			if (employeeTypes[i].equals("Commission")) {
-//				commissionSum += pay[i];
-//				numberOfCommissionPaidEmployees++;
-//			} else if (employeeTypes[i].equals("Hourly")) {
-//				hourlySum += pay[i];
-//				numberOfHourlyPaidEmployees++;
-//			} else if (employeeTypes[i].equals("Salary")) {
-//				salarySum += pay[i];
-//				numberOfSalaryPaidEmployees++;
-//			}
-//		}
 		putAveragesInOutputString();
-		
-
 		createHashMapsOfNames("First", firstnames);
 		createHashMapsOfNames("Last", lastnames);
 		scanner.close();
