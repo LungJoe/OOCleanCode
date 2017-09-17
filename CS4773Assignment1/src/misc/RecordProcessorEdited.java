@@ -47,19 +47,12 @@ public class RecordProcessorEdited {
 	 */
 	
 	public static String processFile(String fileName) {
-		file = new File(fileName);
-		fileReader = initializeScanner(file);
-
-		numberOfEmployees = countNonemptyLinesInFile(fileReader);
-		initialzeEmployeeAttributeArrays(numberOfEmployees);
-
-		fileReader.close();
-		fileReader = initializeScanner(file);
-
-		if (checkIfFileIsEmpty(numberOfEmployees) == true)
-			return closeScannerAndExit();
-
-		numberOfEmployees = 0;
+		
+		try{
+		readFileContents(fileName);
+		}catch (RuntimeException err){
+			return null;
+		}
 
 		putEmployeesIntoAttributeArraysByReadingFile();
 		printFileFormat();
@@ -72,6 +65,24 @@ public class RecordProcessorEdited {
 		return outputString.toString();
 	}
 
+	private static void readFileContents(String fileName){
+		file = new File(fileName);
+		fileReader = initializeScanner(file);
+
+		numberOfEmployees = countNonemptyLinesInFile(fileReader);
+		initialzeEmployeeAttributeArrays(numberOfEmployees);
+
+		fileReader.close();
+		fileReader = initializeScanner(file);
+
+		if (checkIfFileIsEmpty(numberOfEmployees) == true){
+			closeScannerAndExit();
+			throw new RuntimeException("File is empty");
+		}
+
+		numberOfEmployees = 0;
+	}
+	
 	private static int countNonemptyLinesInFile(Scanner scanner) {
 		int lineCount = 0;
 		while (scanner.hasNextLine()) {
