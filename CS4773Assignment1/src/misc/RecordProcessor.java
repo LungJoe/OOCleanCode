@@ -13,7 +13,7 @@ import java.util.Set;
  *	       Jonathan Jimenez
  *
  */
-public class RecordProcessorEdited {
+public class RecordProcessor {
 
 	private static String[] employeeFirstnames;
 	private static String[] employeeLastnames;

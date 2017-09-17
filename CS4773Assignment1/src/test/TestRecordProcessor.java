@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.Scanner;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import misc.RecordProcessorEdited;
+import misc.RecordProcessor;
 
 public class TestRecordProcessor {
 	private static String expectedFromData1;
@@ -23,16 +23,16 @@ public class TestRecordProcessor {
 
 	@Test
 	public void testFileData1() {
-		assertEquals(expectedFromData1, RecordProcessorEdited.printEmployeeRecords("data1.txt"));
+		assertEquals(expectedFromData1, RecordProcessor.printEmployeeRecords("data1.txt"));
 	}
 
 	@Test(expected = RuntimeException.class)
 	public void testFileData2() {
-		assertEquals("File is empty", RecordProcessorEdited.printEmployeeRecords("data2.txt"));
+		assertEquals("File is empty", RecordProcessor.printEmployeeRecords("data2.txt"));
 	}
 
 	@Test(expected = NumberFormatException.class)
 	public void testFileData3() {
-		assertEquals(null, RecordProcessorEdited.printEmployeeRecords("data3.txt"));
+		assertEquals(null, RecordProcessor.printEmployeeRecords("data3.txt"));
 	}
 }
