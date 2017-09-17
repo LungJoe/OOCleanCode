@@ -6,6 +6,13 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * @author Lung Joe, 
+ * 		   Jh'on West, 
+ * 		   Jonathan Fisher, 
+ *	       Jonathan Jimenez
+ *
+ */
 public class RecordProcessorEdited {
 
 	private static String[] firstnames;
@@ -13,11 +20,11 @@ public class RecordProcessorEdited {
 	private static String[] employeeTypes;
 	private static int[] ages;
 	private static double[] pay;
-	private static int numberOfPeople;
+	private static int numberOfEmployees;
 
 	private static File file;
-	private static Scanner scanner;
-	private static StringBuffer stringBuff = new StringBuffer();
+	private static Scanner fileReader;
+	private static StringBuffer outputString = new StringBuffer();
 
 	private static int ageSum = 0;
 	private static double commissionSum = 0;
@@ -31,20 +38,26 @@ public class RecordProcessorEdited {
 	private static int countOfSameName;
 	private static int sortIndex;
 
+	/**
+	 * @param fileName - name of file that is read
+	 * @return outputString - if file is not empty, prints format and 
+	 * 						  Employee attributes
+	 */
+	
 	public static String processFile(String fileName) {
 		file = new File(fileName);
-		scanner = initializeScanner(file);
+		fileReader = initializeScanner(file);
 
-		numberOfPeople = countNonemptyLinesInFile(scanner);
-		initialzeEmployeeAttributeArrays(numberOfPeople);
+		numberOfEmployees = countNonemptyLinesInFile(fileReader);
+		initialzeEmployeeAttributeArrays(numberOfEmployees);
 
-		scanner.close();
-		scanner = initializeScanner(file);
+		fileReader.close();
+		fileReader = initializeScanner(file);
 
-		if (checkIfFileIsEmpty(numberOfPeople) == true)
-			return closeAndExit();
+		if (checkIfFileIsEmpty(numberOfEmployees) == true)
+			return closeScannerAndExit();
 
-		numberOfPeople = 0;
+		numberOfEmployees = 0;
 
 		putEmployeesIntoAttributeArraysByReadingFile();
 		printFileFormat();
@@ -52,9 +65,9 @@ public class RecordProcessorEdited {
 		putAveragesInOutputString();
 		createHashMapsOfNames("First", firstnames);
 		createHashMapsOfNames("Last", lastnames);
-		scanner.close();
+		fileReader.close();
 
-		return stringBuff.toString();
+		return outputString.toString();
 	}
 
 	private static int countNonemptyLinesInFile(Scanner scanner) {
@@ -93,9 +106,9 @@ public class RecordProcessorEdited {
 		return false;
 	}
 
-	private static String closeAndExit() {
+	private static String closeScannerAndExit() {
 		try {
-			scanner.close();
+			fileReader.close();
 		} catch (Exception err) {
 			// Normal situation; scanner is already closed
 		}
@@ -103,11 +116,11 @@ public class RecordProcessorEdited {
 	}
 
 	public static void putEmployeesIntoAttributeArraysByReadingFile() {
-		while (scanner.hasNextLine()) {
-			String currentLine = scanner.nextLine();
+		while (fileReader.hasNextLine()) {
+			String currentLine = fileReader.nextLine();
 			if (currentLine.length() > 0) {
 				sortAllAttributeListsByLastName(currentLine);
-				setEmployeeValues(sortIndex, currentLine);
+				putEmployeeValuesIntoAttributeArrays(sortIndex, currentLine);
 			}
 		}
 	}
@@ -120,15 +133,15 @@ public class RecordProcessorEdited {
 			if (lastnames[sortIndex] == null)
 				break;
 			if (lastnames[sortIndex].compareTo(wordsInCurrentLine[1]) > 0) {
-				pushPersonBackwardsInLists(sortIndex);
+				pushEmployeeBackwardsInLists(sortIndex);
 				break;
 			}
 		}
-		numberOfPeople++;
+		numberOfEmployees++;
 	}
 
-	private static void pushPersonBackwardsInLists(int index) {
-		for (int i = numberOfPeople; i > index; i--) {
+	private static void pushEmployeeBackwardsInLists(int index) {
+		for (int i = numberOfEmployees; i > index; i--) {
 			firstnames[i] = firstnames[i - 1];
 			lastnames[i] = lastnames[i - 1];
 			ages[i] = ages[i - 1];
@@ -136,18 +149,13 @@ public class RecordProcessorEdited {
 			pay[i] = pay[i - 1];
 		}
 	}
-
-	private static void setEmployeeValues(int sortIndex, String currentLine) {
-		String[] wordsInCurrentLine = currentLine.split(",");
-		firstnames[sortIndex] = wordsInCurrentLine[0];
-		lastnames[sortIndex] = wordsInCurrentLine[1];
-		employeeTypes[sortIndex] = wordsInCurrentLine[3];
-
-		checkForInvalidValue(sortIndex, wordsInCurrentLine);
-	}
-
-	private static void checkForInvalidValue(int currentLineIndex, String[] wordsInCurrentLine) {
+	
+	private static void putEmployeeValuesIntoAttributeArrays(int currentLineIndex, String currentLine) {
 		try {
+			String[] wordsInCurrentLine = currentLine.split(",");
+			firstnames[sortIndex] = wordsInCurrentLine[0];
+			lastnames[sortIndex] = wordsInCurrentLine[1];
+			employeeTypes[sortIndex] = wordsInCurrentLine[3];
 			ages[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
 			pay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
 		} catch (Exception e) {
@@ -156,23 +164,23 @@ public class RecordProcessorEdited {
 	}
 
 	private static void printFileFormat() {
-		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
+		outputString.append(String.format("# of people imported: %d\n", firstnames.length));
 
-		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
+		outputString.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
 		for (int i = 0; i < 30; i++)
-			stringBuff.append(String.format("-"));
+			outputString.append(String.format("-"));
 
-		stringBuff.append(String.format(" ---  "));
+		outputString.append(String.format(" ---  "));
 		for (int i = 0; i < 12; i++)
-			stringBuff.append(String.format("-"));
+			outputString.append(String.format("-"));
 
-		stringBuff.append(String.format(" "));
+		outputString.append(String.format(" "));
 		for (int i = 0; i < 12; i++)
-			stringBuff.append(String.format("-"));
+			outputString.append(String.format("-"));
 
-		stringBuff.append(String.format("\n"));
+		outputString.append(String.format("\n"));
 		for (int i = 0; i < firstnames.length; i++)
-			stringBuff.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
+			outputString.append(String.format("%-30s %-3d  %-12s $%12.2f\n", firstnames[i] + " " + lastnames[i], ages[i], employeeTypes[i], pay[i]));
 	}
 
 	private static void calculatePaySums() {
@@ -193,16 +201,16 @@ public class RecordProcessorEdited {
 
 	private static void putAveragesInOutputString() {
 		float ageAverage = (float) ageSum / firstnames.length;
-		stringBuff.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
+		outputString.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
 
 		double commissionAverage = commissionSum / numberOfCommissionPaidEmployees;
-		stringBuff.append(String.format("Average commission:  $%12.2f\n", commissionAverage));
+		outputString.append(String.format("Average commission:  $%12.2f\n", commissionAverage));
 
 		double hourlyAverage = hourlySum / numberOfHourlyPaidEmployees;
-		stringBuff.append(String.format("Average hourly wage: $%12.2f\n", hourlyAverage));
+		outputString.append(String.format("Average hourly wage: $%12.2f\n", hourlyAverage));
 
 		double salaryAverage = salarySum / numberOfSalaryPaidEmployees;
-		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
+		outputString.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 	}
 
 	private static void createHashMapsOfNames(String nameType, String[] nameList) {
@@ -221,17 +229,17 @@ public class RecordProcessorEdited {
 
 	private static void checkOccuranceOfDuplicateNames(String nameType, HashMap<String, Integer> hashCountingUniqueNames) {
 		if (countOfSameName > 0) {
-			printDuplicateNameOccurance(hashCountingUniqueNames, nameType);
+			printOccuranceOfDuplicateNames(hashCountingUniqueNames, nameType);
 		} else
-			stringBuff.append(String.format("All %s names are unique", nameType.toLowerCase()));
+			outputString.append(String.format("All %s names are unique", nameType.toLowerCase()));
 	}
 
-	private static void printDuplicateNameOccurance(HashMap<String, Integer> hashCountingUniqueNames, String typeOfName) {
-		stringBuff.append(String.format("\n" + typeOfName + " names with more than one person sharing it:\n"));
+	private static void printOccuranceOfDuplicateNames(HashMap<String, Integer> hashCountingUniqueNames, String nameType) {
+		outputString.append(String.format("\n" + nameType + " names with more than one person sharing it:\n"));
 		Set<String> set = hashCountingUniqueNames.keySet();
 		for (String str : set) {
 			if (hashCountingUniqueNames.get(str) > 1) {
-				stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueNames.get(str)));
+				outputString.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueNames.get(str)));
 			}
 		}
 	}
