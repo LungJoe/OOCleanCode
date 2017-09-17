@@ -40,8 +40,10 @@ public class RecordProcessorEdited {
 
 	/**
 	 * @param fileName - name of file that is read
-	 * @return outputString - if file is not empty, prints format and 
-	 * 						  Employee attributes
+	 * @return 	null - if file is empty
+	 * 			outputString - if file is not empty, prints format and 
+	 * 						   Employee attributes
+	 * 			
 	 */
 	
 	public static String processFile(String fileName) {
