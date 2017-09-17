@@ -26,31 +26,36 @@ public class RecordProcessorEdited {
 	private static double salarySum = 0;
 	private static int countOfSameName;
 
+	public static String processFile(String fileName) {
+		file = new File(fileName);
+		scanner = initializeScanner(file);
 
-	public static void initialzeEmployeeAttributeArrays(int numberOfPeople) {
-		firstnames = new String[numberOfPeople];
-		lastnames = new String[numberOfPeople];
-		ages = new int[numberOfPeople];
-		employeeTypes = new String[numberOfPeople];
-		pay = new double[numberOfPeople];
-	}
+		numberOfPeople = countNonemptyLinesInFile(scanner);
 
-	public static Scanner initializeScanner(File file) {
-		try {
-			return new Scanner(file);
-		} catch (FileNotFoundException err) {
-			System.err.println(err.getMessage());
+		initialzeEmployeeAttributeArrays(numberOfPeople);
 
-			return null;
+		scanner.close();
+		scanner = initializeScanner(file);
+
+		if (checkIfFileIsEmpty(numberOfPeople))
+			return closeAndExit();
+
+		numberOfPeople = 0;
+
+		while (scanner.hasNextLine()) {
+			String currentLine = scanner.nextLine();
+			if (currentLine.length() > 0) {
+				sortAllAttributeListsByLastName(currentLine);
+			}
 		}
-	}
 
-	public static boolean checkIfFileIsEmpty(int nonEmptyLinesInFile) {
-		if (nonEmptyLinesInFile == 0) {
-			System.err.println("No records found in data file");
-			return true;
-		}
-		return false;
+		printFileFormat();
+		calculatePaySums();
+		putAveragesInOutputString();
+		createHashMapsOfNames("First", firstnames);
+		createHashMapsOfNames("Last", lastnames);
+		scanner.close();
+		return stringBuff.toString();
 	}
 
 	public static int countNonemptyLinesInFile(Scanner scanner) {
@@ -63,11 +68,37 @@ public class RecordProcessorEdited {
 		return lineCount;
 	}
 
+	public static Scanner initializeScanner(File file) {
+		try {
+			return new Scanner(file);
+		} catch (FileNotFoundException err) {
+			System.err.println(err.getMessage());
+
+			return null;
+		}
+	}
+
+	public static void initialzeEmployeeAttributeArrays(int numberOfPeople) {
+		firstnames = new String[numberOfPeople];
+		lastnames = new String[numberOfPeople];
+		ages = new int[numberOfPeople];
+		employeeTypes = new String[numberOfPeople];
+		pay = new double[numberOfPeople];
+	}
+
+	public static boolean checkIfFileIsEmpty(int nonEmptyLinesInFile) {
+		if (nonEmptyLinesInFile == 0) {
+			System.err.println("No records found in data file");
+			return true;
+		}
+		return false;
+	}
+
 	public static String closeAndExit() {
 		try {
 			scanner.close();
 		} catch (Exception err) {
-
+			// Normal situation; scanner is already closed
 		}
 		return null;
 	}
@@ -84,30 +115,11 @@ public class RecordProcessorEdited {
 				break;
 			}
 		}
-		
+
 		setEmployeeValues(currentLineIndex, wordsInCurrentLine);
 		numberOfPeople++;
 	}
-	
-	public static void setEmployeeValues(int currentLineIndex,String[] wordsInCurrentLine){
-		firstnames[currentLineIndex] = wordsInCurrentLine[0];
-		lastnames[currentLineIndex] = wordsInCurrentLine[1];
-		employeeTypes[currentLineIndex] = wordsInCurrentLine[3];
-		
-		checkForInvalidValue(currentLineIndex, wordsInCurrentLine);
-	}
-	
-	public static void checkForInvalidValue(int currentLineIndex, String[] wordsInCurrentLine){
-		try {
-			ages[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
-			pay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
-		} catch (Exception e) {
-			throw new NumberFormatException();
-//			System.err.println(e.getMessage());
-//			scanner.close();
-		}
-	}
-	
+
 	public static void pushPersonBackwardsInLists(int index) {
 		for (int i = numberOfPeople; i > index; i--) {
 			firstnames[i] = firstnames[i - 1];
@@ -117,8 +129,25 @@ public class RecordProcessorEdited {
 			pay[i] = pay[i - 1];
 		}
 	}
-	
-	public static void printFileFormat(){
+
+	public static void setEmployeeValues(int currentLineIndex, String[] wordsInCurrentLine) {
+		firstnames[currentLineIndex] = wordsInCurrentLine[0];
+		lastnames[currentLineIndex] = wordsInCurrentLine[1];
+		employeeTypes[currentLineIndex] = wordsInCurrentLine[3];
+
+		checkForInvalidValue(currentLineIndex, wordsInCurrentLine);
+	}
+
+	public static void checkForInvalidValue(int currentLineIndex, String[] wordsInCurrentLine) {
+		try {
+			ages[currentLineIndex] = Integer.parseInt(wordsInCurrentLine[2]);
+			pay[currentLineIndex] = Double.parseDouble(wordsInCurrentLine[4]);
+		} catch (Exception e) {
+			throw new NumberFormatException();
+		}
+	}
+
+	public static void printFileFormat() {
 		stringBuff.append(String.format("# of people imported: %d\n", firstnames.length));
 
 		stringBuff.append(String.format("\n%-30s %s  %-12s %12s\n", "Person Name", "Age", "Emp. Type", "Pay"));
@@ -137,8 +166,8 @@ public class RecordProcessorEdited {
 		}
 
 	}
-	
-	private static void calculatePaySums(){
+
+	private static void calculatePaySums() {
 		for (int i = 0; i < firstnames.length; i++) {
 			ageSum += ages[i];
 			if (employeeTypes[i].equals("Commission")) {
@@ -153,7 +182,8 @@ public class RecordProcessorEdited {
 			}
 		}
 	}
-	private static void putAveragesInOutputString(){
+
+	private static void putAveragesInOutputString() {
 		float ageAverage = (float) ageSum / firstnames.length;
 		stringBuff.append(String.format("\nAverage age:         %12.1f\n", ageAverage));
 		double commissionAverage = commissionSum / numberOfCommissionPaidEmployees;
@@ -163,71 +193,37 @@ public class RecordProcessorEdited {
 		double salaryAverage = salarySum / numberOfSalaryPaidEmployees;
 		stringBuff.append(String.format("Average salary:      $%12.2f\n", salaryAverage));
 	}
-	
-	public static void createHashMapsOfNames(String nameType, String[] nameList){
+
+	public static void createHashMapsOfNames(String nameType, String[] nameList) {
 		HashMap<String, Integer> hashCountingUniqueNames = new HashMap<String, Integer>();
 		countOfSameName = 0;
-		for(int i = 0; i < nameList.length; i++){
-			if(hashCountingUniqueNames.containsKey(nameList[i])){
-				hashCountingUniqueNames.put(nameList[i], hashCountingUniqueNames.get(nameList[i])+1);
-				countOfSameName ++;
-			}
-			else{
+		for (int i = 0; i < nameList.length; i++) {
+			if (hashCountingUniqueNames.containsKey(nameList[i])) {
+				hashCountingUniqueNames.put(nameList[i], hashCountingUniqueNames.get(nameList[i]) + 1);
+				countOfSameName++;
+			} else {
 				hashCountingUniqueNames.put(nameList[i], 1);
 			}
 		}
 		checkOccuranceOfDuplicateNames(nameType, hashCountingUniqueNames);
 	}
-	
-	private static void checkOccuranceOfDuplicateNames(String nameType, HashMap<String, Integer> hashCountingUniqueNames){
-		if(countOfSameName > 0){
+
+	private static void checkOccuranceOfDuplicateNames(String nameType, HashMap<String, Integer> hashCountingUniqueNames) {
+		if (countOfSameName > 0) {
 			printDuplicateNameOccurance(hashCountingUniqueNames, nameType);
-		} 
-		else{
+		} else {
 			stringBuff.append(String.format("All %s names are unique", nameType.toLowerCase()));
 		}
 	}
-	
-	public static void printDuplicateNameOccurance(HashMap<String,Integer> hashCountingUniqueNames, String typeOfName){
+
+	public static void printDuplicateNameOccurance(HashMap<String, Integer> hashCountingUniqueNames, String typeOfName) {
 		stringBuff.append(String.format("\n" + typeOfName + " names with more than one person sharing it:\n"));
 		Set<String> set = hashCountingUniqueNames.keySet();
 		for (String str : set) {
 			if (hashCountingUniqueNames.get(str) > 1) {
 				stringBuff.append(String.format("%s, # people with this name: %d\n", str, hashCountingUniqueNames.get(str)));
 			}
-		}		
-	}
-	
-	public static String processFile(String fileName) {
-		file = new File(fileName);
-		scanner = initializeScanner(file);
-
-		numberOfPeople = countNonemptyLinesInFile(scanner);
-
-		initialzeEmployeeAttributeArrays(numberOfPeople);
-
-		scanner.close();
-		scanner = initializeScanner(file);
-
-		if (checkIfFileIsEmpty(numberOfPeople))
-			return closeAndExit();
-
-		numberOfPeople = 0;
-		
-		while (scanner.hasNextLine()) {
-			String currentLine = scanner.nextLine();
-			if (currentLine.length() > 0) {
-				sortAllAttributeListsByLastName(currentLine);
-			}	
 		}
-	
-		printFileFormat();
-		calculatePaySums();
-		putAveragesInOutputString();
-		createHashMapsOfNames("First", firstnames);
-		createHashMapsOfNames("Last", lastnames);
-		scanner.close();
-		return stringBuff.toString();
 	}
 
 }
